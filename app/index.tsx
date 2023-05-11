@@ -18,16 +18,16 @@ const App = () => {
       <Text className="text-xl">Welcome to Chai ☕ Stack</Text>
       <Link
         className="text-center w-48 bg-violet-400 text-md p-2"
-        href="/hello"
+        href="/teste1"
       >
-        Go to Another Page
+        Teste 1
       </Link>
       <Text className="text-xl">Look at the number of clicks: {click}</Text>
       <Link
         className="text-center w-48 bg-violet-400 text-md p-2"
-        href="/clicks"
+        href="/teste2"
       >
-        Go to Clicks Page
+        Teste 2
       </Link>
     </SafeAreaView>
   );
