@@ -1,46 +1,67 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
-import { Text, View } from "react-native";
-import { BleManager } from "react-native-ble-plx";
+import React, { useState, useLayoutEffect } from "react";
+import { Text, Button, View } from "react-native";
 import * as Permissions from "expo-permissions";
+import { BleManager } from "react-native-ble-plx";
 
-export default function App() {
-  const [devices, setDevices] = useState([]);
-  const bleManagerRef = useRef<BleManager>();
+const BluetoothScanner: React.FC = () => {
+  const [scanning, setScanning] = useState(false);
+  const [devices, setDevices] = useState<any[]>([]);
+  const [error, setError] = useState("");
+  const manager = new BleManager(); // Declare a variável manager aqui
 
   useLayoutEffect(() => {
-    const startScan = async () => {
-      const { status } = await Permissions.askAsync(Permissions.LOCATION);
+    Permissions.askAsync(Permissions.LOCATION).then(({ status }) => {
       if (status !== "granted") {
-        console.error("Location permission not granted");
+        setError("Permissão de localização negada.");
+      }
+    });
+  }, []);
+
+  const scanDevices = () => {
+    setScanning(true);
+    setDevices([]);
+
+    manager.startDeviceScan(null, null, (error, device) => {
+      if (error) {
+        setError(error.message);
+        setScanning(false);
+        // manager.destroy();
         return;
       }
 
-      bleManagerRef.current = new BleManager();
+      if (device && device.name) {
+        setDevices((prevDevices) => {
+          if (prevDevices.some((d) => d.id === device.id)) {
+            return prevDevices;
+          }
 
-      bleManagerRef.current.startDeviceScan(null, null, (error, device) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        if (device && !devices.find((d) => d.id === device.id)) {
-          setDevices((devices) => [...devices, device]);
-        }
-      });
-    };
+          return [...prevDevices, device];
+        });
+      }
+    });
+  };
 
-    startScan();
-
-    return () => {
-      bleManagerRef.current?.stopDeviceScan();
-    };
-  }, []);
+  const stopScan = () => {
+    setScanning(false);
+    manager.destroy();
+  };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Dispositivos Bluetooth:</Text>
+    <View className="flex-1 justify-center items-center">
+      {error ? <Text>{error}</Text> : null}
+      {scanning ? (
+        <>
+          <Text>Scaneando...</Text>
+          <Button title="Parar" onPress={stopScan} />
+        </>
+      ) : (
+        <Button title="Escanear" onPress={scanDevices} />
+      )}
       {devices.map((device) => (
-        <Text key={device.id}>{device.name || device.id}</Text>
+        <Text key={device.id}>{device.name}</Text>
       ))}
     </View>
   );
-}
+};
+
+export default BluetoothScanner;
