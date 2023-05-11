@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "scheme": "myapp",
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e206499f-f52f-4038-8b00-91c0cfa71ea6"
+      }
+    },
+    "android": {
+      "package": "com.gabriel300p.bluetooth"
+    },
+    "plugins": ["@config-plugins/react-native-ble-plx"]
+  }
+}
